@@ -8,3 +8,11 @@ bin/Debug/chdate.vshost.exe.manifest
 bin/Debug/chdate.vshost.exe.config
 bin/Debug/chdate.vshost.exe
 bin/Debug/chdate.exe.config
+bin/Debug/chdate.exe
+*.pdb
+*.cache
+*.exe
+obj/Release/chdate.csproj.FileListAbsolute.txt
+bin/Release/chdate.vshost.exe.manifest
+bin/Release/chdate.vshost.exe.config
+bin/Release/chdate.exe.config

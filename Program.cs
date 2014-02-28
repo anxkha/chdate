@@ -7,18 +7,20 @@ namespace chdate
     {
         private const string CREATED_DATE_OPTION = "/c";
         private const string MODIFIED_DATE_OPTION = "/m";
+        private const string HELP_OPTION = "/?";
 
-        private string _path;
-        private DateTimeOffset _creationDate;
-        private DateTimeOffset _modifiedDate;
-        private bool _changeCreationDate;
-        private bool _changeModifiedDate;
+        private static string _path;
+        private static DateTimeOffset _creationDate;
+        private static DateTimeOffset _modifiedDate;
+        private static bool _changeCreationDate;
+        private static bool _changeModifiedDate;
 
-        private int Main(string[] args)
+        private static int Main(string[] args)
         {
             try
             {
                 ParseCommandline(args);
+                Run();
             }
             catch (Exception e)
             {
@@ -29,25 +31,31 @@ namespace chdate
             return 0;
         }
 
-        private void ParseCommandline(string[] args)
+        private static void ParseCommandline(string[] args)
         {
-            if (args.Length < 4)
-            {
+            if (0 == args.Length)
                 ShowUsage();
-                throw new Exception();
-            }
 
-            _path = args[1];
+            if (HELP_OPTION == args[0])
+                ShowUsage();
 
-            for(int position = 2; position < args.Length; position++)
+            if (args.Length < 3)
+                ShowUsage();
+
+            _path = args[0];
+
+            for(int position = 1; position < args.Length; position++)
             {
-                if(CREATED_DATE_OPTION == args[position])
+                if(HELP_OPTION == args[position])
+                    ShowUsage();
+                else if(CREATED_DATE_OPTION == args[position])
                 {
                     if ((position + 1) == args.Length)
                         throw new Exception("Expected missing parameter <creation date> after " + CREATED_DATE_OPTION + ".");
 
                     _creationDate = DateTimeOffset.Parse(args[position + 1]);
                     _changeCreationDate = true;
+                    position++;
                 }
                 else if(MODIFIED_DATE_OPTION == args[position])
                 {
@@ -56,13 +64,53 @@ namespace chdate
 
                     _modifiedDate= DateTimeOffset.Parse(args[position + 1]);
                     _changeModifiedDate = true;
+                    position++;
                 }
             }
+
+            if ((false == _changeCreationDate) && (false == _changeModifiedDate))
+                throw new Exception("One of either the /m or /c parameters is required.");
         }
 
-        private void ShowUsage()
+        private static void ShowUsage()
         {
-            // TODO:
+            Console.WriteLine("Usage:");
+            Console.WriteLine("chdate.exe <path to file or directory> [/m <modified date> | /c <creation date>]");
+            Console.WriteLine("One of either /m or /c is required. Both can be specified at the same time.");
+            throw new Exception("");
+        }
+
+        private static void Run()
+        {
+            if (Directory.Exists(_path))
+                RunRecursiveForDirectory(_path);
+            else if (File.Exists(_path))
+                RunForSingleFile(_path);
+            else
+                throw new Exception(@"""" + _path + @""" is not a valid file or directory.");
+        }
+
+        private static void RunRecursiveForDirectory(string root)
+        {
+            string[] childDirectories = Directory.GetDirectories(root);
+            string[] files = Directory.GetFiles(root);
+
+            foreach (string file in files)
+                RunForSingleFile(file);
+
+            foreach (string directory in childDirectories)
+                RunRecursiveForDirectory(directory);
+        }
+
+        private static void RunForSingleFile(string path)
+        {
+            Console.WriteLine("Setting dates for " + path);
+
+            if (_changeCreationDate)
+                File.SetCreationTimeUtc(path, _creationDate.UtcDateTime);
+
+            if (_changeModifiedDate)
+                File.SetLastWriteTimeUtc(path, _modifiedDate.UtcDateTime);
         }
     }
 }
