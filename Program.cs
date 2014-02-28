@@ -1,5 +1,5 @@
 ﻿// Author: Lucas Suggs (Anxkha)
-// Last Updated: 2014-02-27
+// Last Updated: 2014-02-28
 //
 // This code is public domain. Refer to the LICENSE file for details.
 
@@ -58,7 +58,16 @@ namespace chdate
                     if ((position + 1) == args.Length)
                         throw new Exception("Expected missing parameter <creation date> after " + CREATED_DATE_OPTION + ".");
 
-                    _creationDate = DateTimeOffset.Parse(args[position + 1]);
+                    try
+                    {
+                        _creationDate = DateTimeOffset.Parse(args[position + 1]);
+                    }
+                    catch(FormatException)
+                    {
+                        Console.Error.WriteLine("The creation date specified is of the wrong date format.\n");
+                        ShowUsage();
+                    }
+
                     _changeCreationDate = true;
                     position++;
                 }
@@ -67,7 +76,16 @@ namespace chdate
                     if ((position + 1) == args.Length)
                         throw new Exception("Expected missing parameter <modified date> after " + MODIFIED_DATE_OPTION + ".");
 
-                    _modifiedDate= DateTimeOffset.Parse(args[position + 1]);
+                    try
+                    {
+                        _modifiedDate = DateTimeOffset.Parse(args[position + 1]);
+                    }
+                    catch(FormatException)
+                    {
+                        Console.Error.WriteLine("The modified date specified is of the wrong date format.\n");
+                        ShowUsage();
+                    }
+
                     _changeModifiedDate = true;
                     position++;
                 }
@@ -81,7 +99,11 @@ namespace chdate
         {
             Console.WriteLine("Usage:");
             Console.WriteLine("chdate.exe <path to file or directory> [/m <modified date> | /c <creation date>]");
-            Console.WriteLine("One of either /m or /c is required. Both can be specified at the same time.");
+            Console.WriteLine("One of either /m or /c is required. Both can be specified at the same time.\n");
+            Console.WriteLine("Example date formats:\n");
+            Console.WriteLine("\"2014-02-28\"");
+            Console.WriteLine("\"2014-02-28 10:54\"");
+            Console.WriteLine("\"2014-02-28 10:54 -8\"");
             throw new Exception("");
         }
 
