@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Author: Lucas Suggs (Anxkha)
+// Last Updated: 2014-02-27
+//
+// This code is public domain. Refer to the LICENSE file for details.
+
+using System;
 using System.IO;
 
 namespace chdate
