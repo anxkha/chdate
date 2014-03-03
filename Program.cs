@@ -133,11 +133,22 @@ namespace chdate
         {
             Console.WriteLine("Setting dates for " + path);
 
-            if (_changeCreationDate)
-                File.SetCreationTimeUtc(path, _creationDate.UtcDateTime);
+            try
+            {
+                if (_changeCreationDate)
+                    File.SetCreationTimeUtc(path, _creationDate.UtcDateTime);
 
-            if (_changeModifiedDate)
-                File.SetLastWriteTimeUtc(path, _modifiedDate.UtcDateTime);
+                if (_changeModifiedDate)
+                    File.SetLastWriteTimeUtc(path, _modifiedDate.UtcDateTime);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
+            catch (PathTooLongException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
         }
     }
 }
